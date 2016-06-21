@@ -127,6 +127,11 @@
             </div>
             <% } else if (name == 'look_at' || name == 'gaze_at') { %>
             <div class="form-group">
+                <label>Attention region</label>
+                <select class="app-attention-region-select"></select>
+            </div>
+
+            <div class="form-group">
                 <div class="app-crosshair"></div>
             </div>
             <% } else if (name == 'pause') { %>
@@ -135,6 +140,19 @@
 
                 <input type="text" class="app-node-topic form-control" title="Topic name"
                        value="<%= typeof topic == 'undefined' ? '' : topic %>"/>
+            </div>
+
+            <div class="form-group">
+                <label>Timeout</label>
+                <div class="input-group">
+                    <input type="number" class="app-node-timeout form-control" title="Timeout"/>
+                    <div class="input-group-addon">s</div>
+                </div>
+            </div>
+            <% } else if (name == 'random') { %>
+            <div class="form-group">
+                <label>Performance</label>
+                <select class="app-random-node-performance-select"></select>
             </div>
             <% } %>
 

@@ -33,7 +33,7 @@ define(['marionette', 'tpl!./templates/performances.tpl', './performance', '../e
                     drop: function (event, ui) {
                         var view = self.children.findByCid(ui.draggable.data('cid'));
                         if (view) {
-                            view.model.set('path', self.joinPaths(self.currentPath, view.model.id));
+                            view.model.set({'path': self.currentPath, ignore_nodes: true});
                             view.model.save();
                         }
                         self.updateVisiblePerformances(self.currentPath);
@@ -43,8 +43,7 @@ define(['marionette', 'tpl!./templates/performances.tpl', './performance', '../e
                 this.updateTabs();
             },
             addNew: function () {
-                var performance = new Performance({name: 'New performance'});
-                performance.set({path: this.joinPaths(this.currentPath, performance.id)});
+                var performance = new Performance({name: 'New performance', path: this.currentPath});
                 this.collection.add(performance);
                 this.trigger('new', performance);
             },
@@ -59,7 +58,9 @@ define(['marionette', 'tpl!./templates/performances.tpl', './performance', '../e
                 this.ui.newButton.before(childView.el);
 
                 // hiding if not from current directory
-                if (this.getParentPath(childView.model.get('path')) != this.currentPath)
+                if ((childView.model.get('path') || '') == this.currentPath)
+                    childView.$el.show();
+                else
                     childView.$el.hide();
             },
             currentPath: '',
@@ -71,7 +72,7 @@ define(['marionette', 'tpl!./templates/performances.tpl', './performance', '../e
 
                 // create a list of all directories
                 _.each(paths, function (path, i) {
-                    path = path.split('/').slice(0, -1);
+                    path = path.split('/');
                     for (var i = 0; i < path.length; i++)
                         dirs.push(path.slice(0, i + 1).join('/'));
                 });
@@ -79,13 +80,12 @@ define(['marionette', 'tpl!./templates/performances.tpl', './performance', '../e
 
                 var depth = (this.currentPath == '') ? 0 : this.currentPath.split('/').length,
                     currentDirs = _.filter(dirs, function (dir) {
-                        // filtering only dirs in current directory
-                        dir = dir.split('/');
-                        return dir.length == depth + 1 && dir.slice(0, -1).join('/') == self.currentPath;
+                        return self.getParentPath(dir) == self.currentPath;
                     });
 
                 // clear tabs
                 this.ui.tabs.html('');
+
                 // adding tab for parent dir if available
                 if (depth > 0) this.ui.tabs.append(this.createTab(this.getParentPath(this.currentPath), '..'));
 
@@ -150,6 +150,7 @@ define(['marionette', 'tpl!./templates/performances.tpl', './performance', '../e
             switchDir: function (dir) {
                 this.updateVisiblePerformances(dir);
                 this.currentPath = dir;
+                this.collection.currentPath = dir;
                 this.updateTabs();
             },
             updateVisiblePerformances: function (dir) {

@@ -17,7 +17,7 @@ class AudioStrength:
   C_EXPRESSION = 1
   C_GESTURE = 2
   d = 0
-  Decibel = []
+  Decibel = None
   
   def __init__(self):
     
@@ -50,12 +50,12 @@ class AudioStrength:
         netcat(self.hostname, self.port, m)
         return 'Normal Conversation'
         
-    elif value < 75:
+    elif value < 90:
         print "high sound: "
         z = "(cog-evaluate! (EvaluationLink  (DefinedPredicateNode \"Show expression\")" + \
        "(ListLink (ConceptNode \"irritated\") (NumberNode 5) (NumberNode 0.5))))\n"
         n = "(cog-evaluate! (EvaluationLink  (DefinedPredicateNode \"Show gesture\")" + \
-       "(ListLink (ConceptNode \"think-browsDown\") (NumberNode 0.2) (NumberNode 2) (NumberNode 0.8))))\n"
+       "(ListLink (ConceptNode \"think-browsDown.001\") (NumberNode 0.2) (NumberNode 2) (NumberNode 0.8))))\n"
         
         netcat(self.hostname, self.port, z)
         netcat(self.hostname, self.port, n)
@@ -64,7 +64,7 @@ class AudioStrength:
         return 'Loud: Shouted Conversation'
     else:
         t = "(cog-evaluate! (EvaluationLink  (DefinedPredicateNode \"Show expression\")" + \
-       "(ListLink (ConceptNode \"irritated\") (NumberNode 5) (NumberNode 0.5))))\n"
+       "(ListLink (ConceptNode \"afraid\") (NumberNode 5) (NumberNode 0.5))))\n"
         netcat(self.hostname, self.port, t)
         return 'Loud: Critical'
   
@@ -72,13 +72,13 @@ class AudioStrength:
   
       
   def GetAudioClass(self, data):
-    print("Get Audio")
+    
     try:
         
         features = (data.data).split("_")
         self.Decibel=  float(features[0])
         Frequency =float(features[1])
-        print d
+        
         
         if self.loop <=2:
             d.append(self.Decibel)
@@ -88,23 +88,26 @@ class AudioStrength:
             d.popleft();d.append(self.Decibel)
             self.loop += 1
         
-       
+        #self.AudioEnergy(self.Decibel)
     except ArithmeticError as e:
         print(e)
-    
+    return self.Decibel
         
   def GetSuddenClass(self, msg):
-    print("Sudden")
+    
     try:
         change = msg.data
-        print change
+        
         if int(change) > 1:
             print 'sudden change'
             l = "(cog-evaluate! (EvaluationLink (DefinedPredicateNode \"Show expression\")" + \
-       "(ListLink (ConceptNode \"surprised\") (NumberNode 5) (NumberNode 0.5))))\n"
+       "(ListLink (ConceptNode \"surprised\") (NumberNode 1) (NumberNode 0.5))))\n"
+                  
             netcat(self.hostname, self.port, l)
+                       
             
         else:
+                        
             self.AudioEnergy(self.Decibel)
             
           

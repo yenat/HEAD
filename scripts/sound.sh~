@@ -24,7 +24,7 @@ export HR_WORKSPACE=$HR_WORKSPACE
 source $HR_WORKSPACE/$MAJOR_PROJECT/devel/setup.bash
 
 export LAUNCH_DIR="$BASEDIR/../src/vision/audiosysneeds/launch/"
-export listener_dir="/home/yenat/hansonrobotics/HEAD/src/vision/audiosysneeds/src"
+export listener_dir="/home/yenat/hansonrobotics/HEAD/src/audiosysneeds/src"
 export OCBHAVE="$HR_WORKSPACE/opencog/ros-behavior-scripting/"
 
 #Kill existing session

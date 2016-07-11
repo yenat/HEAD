@@ -89,7 +89,9 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg)
         double realx = 320*pt.x;
         double realy = 240*pt.y;
 
-        if(degree >= 8) {       circle(vizRect,cvPoint(realx,realy),5,CV_RGB(255,0,0),-1);        }
+        if(degree >= 7) {       circle(vizRect,cvPoint(realx,realy),5,CV_RGB(0,255,0),-1);        }
+        else if(degree >= 5) {       circle(vizRect,cvPoint(realx,realy),5,CV_RGB(128,128,0),-1);        }
+        else {       circle(vizRect,cvPoint(realx,realy),5,CV_RGB(255,0,0),-1);        }
 
         ros_nmpt_saliency::targets trg;
         trg.positions.push_back(pt);
@@ -282,7 +284,9 @@ double getdegree(double x, double y)
         }
     }
 
+
     /* put the number in between 1 and 10 */
-    passDeg =(passDeg*10)/defaultMax;
+    int roundD =  ((passDeg*10)/defaultMax) + 0.5;
+    passDeg = roundD;
     return passDeg;
 }

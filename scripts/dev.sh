@@ -55,6 +55,7 @@ if [[ -d $OCBHAVE ]]; then
     cd $OCBHAVE/src
     tmux new-window -n 'OCBTree' 'guile -l btree.scm; $SHELL'
     tmux new-window -n 'OCFaceTrack' 'python ../face_track/main.py; $SHELL'
+    tmux new-window -n 'sound' 'python ../sound/sample_sub_audioclass.py; $SHELL'
 fi
 cd $BASEDIR
 tmux new-window -n '$SHELL'

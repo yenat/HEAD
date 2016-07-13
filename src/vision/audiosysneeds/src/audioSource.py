@@ -55,8 +55,8 @@ def suddenChanges(dd):
 if __name__ == '__main__':
     d = deque()
     try:
-        Vsource = rospy.Publisher('/opencog/AudioFeature', String, queue_size=10)
-        Vchange = rospy.Publisher('/opencog/suddenchange', String, queue_size=10)
+        Vsource = rospy.Publisher('/opencog/AudioFeature', String, queue_size=1)
+        Vchange = rospy.Publisher('/opencog/suddenchange', String, queue_size=1)
         rospy.init_node('AudioFeature', anonymous=True)
         rate = rospy.Rate(10)
 

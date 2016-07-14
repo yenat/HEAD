@@ -30,7 +30,7 @@ using namespace cv;
 	ros::Publisher pub;
 	geometry_msgs::Point pt;
 	bool debug_mode;
-    //degree calculator
+        //degree calculator
 	double getdegree(double x, double y);//function declaration for degree of saliency
 
 
@@ -264,7 +264,7 @@ double getdegree(double x, double y)
                     degreeHandler[i][4] = timel;
                 }
                 degreeHandler[i][2] = timel;
-                cout<<x<<","<<y<<"  Category "<<degreeHandler[i][0]<<","<<degreeHandler[i][1]<<" Delay: "<<delay<<" Degree: "<<degreeHandler[i][3]<<endl;
+                //cout<<x<<","<<y<<"  Category "<<degreeHandler[i][0]<<","<<degreeHandler[i][1]<<" Delay: "<<delay<<" Degree: "<<degreeHandler[i][3]<<endl;
                 break; // jumpout from the loop given the point group is found
             }
             else { continue;  } // loop till it get the end or find the group

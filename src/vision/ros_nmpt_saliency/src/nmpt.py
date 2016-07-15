@@ -12,10 +12,12 @@ from pi_face_tracker.msg import FaceEvent, Faces
 class NMPT_SERVO:
   def __init__(self):
     self.GLOBAL_FLAG = 0
+    self.FACES = 0
     self.TOPIC_FACE_TARGET = "/blender_api/set_face_target"
     self.TOPIC_GAZE_TARGET = "/blender_api/set_gaze_target"
     self.TOPIC_SALIENT_POINT = "/nmpt_saliency_point"
     self.TOPIC_FACE_EVENT = "/camera/face_event"
+    self.TOPIC_FACE_LOC = "/camera/face_location"
     
     self.EVENT_NEW_FACE = "new_face"
     self.EVENT_LOST_FACE = "lost_face"
@@ -25,6 +27,7 @@ class NMPT_SERVO:
     self.look_pub = rospy.Publisher(self.TOPIC_FACE_TARGET, Target, queue_size=10)
     self.look_gaze = rospy.Publisher(self.TOPIC_GAZE_TARGET, Target, queue_size=10)
     rospy.Subscriber(self.TOPIC_FACE_EVENT, FaceEvent, self.face_event_cb)
+    rospy.Subscriber(self.TOPIC_FACE_LOC, Faces, self.face_loc_cb)
 
   # Callback for NMPT_B
   def lookat_salientP_cb(self, data):
@@ -44,19 +47,26 @@ class NMPT_SERVO:
         loc.y =(0.5 -loc.y)
     t.z = loc.y
 
-    if self.GLOBAL_FLAG and degree >=5:
+    if self.GLOBAL_FLAG and degree >=5: # Look to Certainly Determined Salient Point
         self.look_pub.publish(t)
         self.look_gaze.publish(t)
 
   def face_event_cb(self, data):
     if data.face_event == self.EVENT_NEW_FACE:
-	print ("Controling pkg: PyFace Tracker")
+	print ("Controlling pkg: PyFace Tracker")
 	self.GLOBAL_FLAG = 0
     elif data.face_event == self.EVENT_LOST_FACE:
-        print ("Controling pkg: Salience Detector")
+        print ("Controlling pkg: Salience Detector")
 	self.GLOBAL_FLAG = 1
     elif data.face_event == self.EVENT_TRACK_FACE:
 	pass
+
+  def face_loc_cb(self, data):
+    self.FACES = 0
+    for face in data.faces:
+    	self.FACES = self.FACES +1
+    print self.FACES
+    	
 
 if __name__ == '__main__':
     global d

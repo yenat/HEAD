@@ -90,7 +90,7 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg)
         double realy = 240*pt.y;
 
         if(degree >= 7) {       circle(vizRect,cvPoint(realx,realy),5,CV_RGB(0,255,0),-1);        }
-        else if(degree >= 5) {       circle(vizRect,cvPoint(realx,realy),5,CV_RGB(128,128,0),-1);        }
+        else if(degree >= 4) {       circle(vizRect,cvPoint(realx,realy),5,CV_RGB(128,128,0),-1);        }
         else {       circle(vizRect,cvPoint(realx,realy),5,CV_RGB(255,0,0),-1);        }
 
         ros_nmpt_saliency::targets trg;
@@ -181,13 +181,13 @@ int main(int argc, char **argv)
 
 
 
-/* Put this function under some relevant Header */
+/* Put this function under some  Header */
 /* Declared the following variables to handle the flow of degree calculation */
 double L,R, T,B; //Bounding Box
 double timel =0.0; //Current Time Handler
 int counter = 0; //Keeps Track of Newly Identified Salient Point
 vector< vector<double> > degreeHandler(10000, vector<double>(5,0)); //Salient Points
-double passDeg, defaultMax=5; // holds random degree value during init
+double passDeg, defaultMax; // holds random degree value during init
 double turn_around_time=1;
 
 /* This method computes the degree of salient points identified through time.
@@ -230,8 +230,14 @@ double getdegree(double x, double y)
             /* creating a bounding rectangle for the upcoming salient point.
             This helps to consider  close enough salient points as one.
             */
-            L=degreeHandler[i][0]- 0.03; R=degreeHandler[i][0]+ 0.03;
-            T=degreeHandler[i][1]- 0.03; B=degreeHandler[i][1]+ 0.03;
+            //27 X 21 Pixel Bounding box
+         L=degreeHandler[i][0]- 0.09; R=degreeHandler[i][0]+ 0.09;
+         T=degreeHandler[i][1]- 0.09; B=degreeHandler[i][1]+ 0.09;
+       /* //max degree check up
+            L=degreeHandler[i][0]- 1.0; R=degreeHandler[i][0]+ 1.0;
+            T=degreeHandler[i][1]- 1.0; B=degreeHandler[i][1]+ 1.0;
+       */
+
 
             /* check whether this point relys in the exsiting group or not */
             /* uncomment these two lines and comment the following two lines
@@ -246,26 +252,23 @@ double getdegree(double x, double y)
                 flag=1;
                 Lturnaround = timel - degreeHandler[i][4];
                 delay = timel - degreeHandler[i][2] ;
-
+                defaultMax = 7.5 * Lturnaround;
                 /* How long the point identified as salient?  */
                 if  (Lturnaround < turn_around_time)
                 {
                     /* add the naromalized salience value (will be one if it has high freq. of occurance)*/
-                    passDeg = degreeHandler[i][3] += (0.023/delay);// maximum possible freq. in time.
-                    if(degreeHandler[i][3]>defaultMax){defaultMax=degreeHandler[i][3];} //substituting max ref. value w/ the better/ if any
-                }
+                    passDeg = (degreeHandler[i][3] += (0.02/delay))* Lturnaround;// maximum possible freq. in time.
+
+                 }
                 else
                 {
-                    /* Was this point the most salient point? if so,  affect the max point of ref. along w/ the reconfiguration of that point */
-                    if(degreeHandler[i][3]-1 >= defaultMax || degreeHandler[i][3]+1 <= defaultMax ) {defaultMax =5;   }
 
-                    degreeHandler[i][3]= 2 ;
-                    passDeg=degreeHandler[i][3];
+                    passDeg=degreeHandler[i][3] =1;
                     degreeHandler[i][4] = timel;
                 }
                 degreeHandler[i][2] = timel;
-                //cout<<x<<","<<y<<"  Category "<<degreeHandler[i][0]<<","<<degreeHandler[i][1]<<" Delay: "<<delay<<" Degree: "<<degreeHandler[i][3]<<endl;
-                break; // jumpout from the loop given the point group is found
+
+                break; // jump out from the loop given the point group is found
             }
             else { continue;  } // loop till it get the end or find the group
         }
@@ -277,7 +280,7 @@ double getdegree(double x, double y)
             degreeHandler[counter][1]=y;
             delay = timel - degreeHandler[counter][2];
             degreeHandler[counter][2]=timel;
-            passDeg = degreeHandler[counter][3]=1;
+            passDeg = degreeHandler[counter][3]=0.1;
             degreeHandler[counter][4] = timel;
             degreeHandler[counter][5]=timel;
             ++counter;
@@ -286,7 +289,9 @@ double getdegree(double x, double y)
 
 
     /* put the number in between 1 and 10 */
+
     int roundD =  ((passDeg*10)/defaultMax) + 0.5;
+    //cout<<"Degree Raw: "<<passDeg<<" Degree Tenth  "<<roundD<<" Possible Raw "<<Lturnaround * 7.5<<endl;
     passDeg = roundD;
     return passDeg;
 }

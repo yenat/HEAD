@@ -39,7 +39,8 @@
 
     <!-- Perception -->
     <include file="$(arg basedir)/perception.launch" />
-
+    <!-- Perception -->
+    <include file="$(arg basedir)/audio.launch" />
     <!-- Web UI and rosbridge for webui -->
     <include file="$(find webui)/webui.launch" />
     <include file="$(arg basedir)/rosbridge.launch" />
